@@ -2,10 +2,10 @@ import java.util.Scanner;
 
 public class project {
     public static kd_tree all = new kd_tree();
-    public static bank_hashTable banks_map = new bank_hashTable();
-    public static bank_hashTable branches_map = new bank_hashTable();
+    public static hashTable banks_map = new hashTable();
+    public static hashTable branches_map = new hashTable();
     public static Bank Must_branch = null;
-    public static neighbor_hashTable neighborhoods = new neighbor_hashTable();
+    public static hashTable neighborhoods = new hashTable();
 
     public static void addB(int x, int y, String name) {
         kd_node NewBank = new kd_node(x, y, name, true);
@@ -20,9 +20,19 @@ public class project {
     public static void addBr(int x, int y, String bank_name, String branch_name) {
         kd_node node = new kd_node(x, y, branch_name, false);
         if (all.insert(node)) {
-            Bank bank = banks_map.get(bank_name);
+            Bank bank = (Bank) banks_map.get(bank_name);
+            if(bank == null){
+                System.out.println("main bank doesn't exist");
+                return;
+            }
             bank.branches.insert(node);
+            bank.Branches_num++;
             branches_map.put(branch_name, bank);
+            if (Must_branch == null) {
+                Must_branch = bank;
+            } else if (bank.Branches_num > Must_branch.Branches_num) {
+                Must_branch = bank;
+            }
             System.out.println("branch added successfully!");
             return;
         } else
@@ -37,8 +47,10 @@ public class project {
         if (node == null) {
             System.out.println("there is no bank in this place!");
         } else {
-            if (all.delete(point) != null) {
-                banks_map.get(branches_map.get(node.name).bank_name).branches.delete(point);
+            if (all.delete(point) != null & !node.is_main) {
+                String name = ((Bank) branches_map.get(node.name)).bank_name;
+                ((Bank) banks_map.get(name)).branches.delete(point);
+                ((Bank) banks_map.get(name)).Branches_num--;
                 branches_map.remove(node.name);
                 System.out.println("branch deleted successfully!");
             }
@@ -53,13 +65,28 @@ public class project {
     }
 
     public static void nearBr(int x, int y, String name) {
-        System.out.println("here");
         int[] point = {x, y};
-        banks_map.get(name).branches.find_nearest_neighbour(point);
+        Bank bank = ((Bank) banks_map.get(name));
+        if(bank == null){
+            System.out.println("main bank doesn't exist");
+            return;
+        }
+        kd_node near = bank.branches.find_nearest_neighbour(point);
+        if (near == null) {
+            System.out.println("this bank has no branch");
+        } else {
+            System.out.println("branch name : " + near.name);
+            System.out.println("Address : ( " + near.point[0] + " , " + near.point[1] + " )");
+        }
     }
 
     public static void listB(String name) {
-        all.in_neighbor(neighborhoods.get(name));
+        neighborhood neighbor= (neighborhood) neighborhoods.get(name);
+        if(neighbor == null){
+            System.out.println("this neighborhood doesn't exist");
+            return;
+        }
+        all.in_neighbor(neighbor);
     }
 
     public static void main(String[] args) {
@@ -70,10 +97,14 @@ public class project {
         String branch_name;
         while (!input.equals("exit")) {
             if (input.equals("addN")) {
-                System.out.print("Enter Coordinate of the neighborhood:");
+                System.out.println("Enter Coordinate of the neighborhood:");
+                System.out.println("x_min:");
                 int x_min = scn.nextInt();
+                System.out.println("x_max");
                 int x_max = scn.nextInt();
+                System.out.println("y_min");
                 int y_min = scn.nextInt();
+                System.out.println("y_max");
                 int y_max = scn.nextInt();
                 scn.nextLine();
                 System.out.println("Enter name of the neighborhood:");
@@ -110,7 +141,13 @@ public class project {
             } else if (input.equals("listBrs")) {
                 System.out.println("enter name of the bank:");
                 bank_name = scn.nextLine();
-                banks_map.get(bank_name).branches.inOrder();
+                Bank bank = (Bank) banks_map.get(bank_name);
+                if (bank == null)
+                    System.out.println("wrong name");
+                else if (bank.Branches_num == 0)
+                    System.out.println("this bank has no branch");
+                else
+                    ((Bank) banks_map.get(bank_name)).branches.inOrder();
             } else if (input.equals("nearB")) {
                 System.out.println("enter coordinate:");
                 x = scn.nextInt();
@@ -133,7 +170,7 @@ public class project {
                 kd_node node = new kd_node(x, y, "center", false);
                 all.in_range(all.root, node, R, 0);
             } else if (input.equals("mostBrs")) {
-                //ToDo
+                System.out.println(Must_branch.bank_name);
             }
             input = scn.nextLine();
         }

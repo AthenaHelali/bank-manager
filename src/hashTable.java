@@ -1,12 +1,12 @@
-public class neighbor_hashTable {
+public class hashTable {
     private list[] table;//keep value
     private int ctr;
 
-    public neighbor_hashTable() {
+    public hashTable() {
         table = new list[30];
     }
 
-    public void put(String key, neighborhood value) {
+    public void put(String key, Object value) {
         int temp = hash(key);
         list value_list = table[temp];
         while (value_list != null) {
@@ -29,7 +29,7 @@ public class neighbor_hashTable {
         }
     }
 
-    public neighborhood get(String key) {
+    public Object get(String key) {
         int temp = hash(key);
         list list = table[temp];
         while (list != null) {

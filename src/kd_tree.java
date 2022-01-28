@@ -121,6 +121,9 @@ public class kd_tree {
     public kd_node delete(kd_node currRoot, int[] point, int dimension) {
         if (currRoot == null) {
             return null;
+        } else if (root.point[0] == point[0] & root.point[1] == point[1] & !root.is_main & root.left_child == null & root.right_child == null) {
+            root = null;
+            return currRoot;
         }
         if (point[0] == currRoot.point[0] & point[1] == currRoot.point[1]) {
             if (currRoot.is_main) {
@@ -165,13 +168,11 @@ public class kd_tree {
     public void inOrder(kd_node node) {
         if (node == null)
             return;
-        else {
-            inOrder(node.left_child);
-            System.out.println("name : " + node.name);
-            System.out.println("x : " + node.point[0]);
-            System.out.println("y : " + node.point[1]);
-            inOrder(node.right_child);
-        }
+        inOrder(node.left_child);
+        System.out.println("name : " + node.name);
+        System.out.println("x : " + node.point[0]);
+        System.out.println("y : " + node.point[1]);
+        inOrder(node.right_child);
     }
 
     public void inOrder() {
@@ -251,15 +252,6 @@ public class kd_tree {
     }
 
     public void in_neighbor(neighborhood neighbor) {
-        in_neighbor(root,neighbor,0);
-    }
-
-
-    public static void main(String[] args) {
-        kd_tree kdTree = new kd_tree();
-        kdTree.insert(new kd_node(2, 4, "br1", false));
-        kdTree.insert(new kd_node(3, 8, "br2", false));
-        kdTree.insert(new kd_node(2, 6, "br3", false));
-        kdTree.inOrder();
+        in_neighbor(root, neighbor, 0);
     }
 }

@@ -1,5 +1,5 @@
 public class list {
     String key;
-    neighborhood value;
+    Object value;
     list next;
 }
